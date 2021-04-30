@@ -1,6 +1,6 @@
 {
   "name": "@ready.io/browser-automation",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Ready.io BrowserAutomation module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
