@@ -1,4 +1,4 @@
-<img src="logo.png" alt="logo" align="left" />
+<img src="https://raw.githubusercontent.com/ready-io/server.js/HEAD/logo.png" alt="logo" align="left" />
 
 # Ready.io
 
