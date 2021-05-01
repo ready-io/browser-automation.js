@@ -81,10 +81,9 @@ class BackgroundService {
                 this.onContentMessage(sender.tab.id, message);
                 sendResponse();
             });
-            //setInterval(() =>
-            //{
-            //this.log('browser.ping');
-            //}, 5000);
+            setInterval(() => {
+                this.log('browser.ping');
+            }, 5000);
         });
     }
     onContentMessage(tabId, message) {
@@ -126,7 +125,7 @@ class BackgroundService {
                     callback();
                 }
             });
-        }, 2000);
+        }, 3000);
     }
     screenshot(_, callback) {
         chrome.tabs.captureVisibleTab((screenshotUrl) => {

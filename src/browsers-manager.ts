@@ -35,7 +35,7 @@ export class BrowsersManager extends Service
 
     try
     {
-      await untilNotNull(() => browser.socket);
+      await untilNotNull(() => browser.socket, 60000);
     }
     catch (error)
     {

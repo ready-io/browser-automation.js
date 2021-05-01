@@ -42,7 +42,7 @@ let BrowsersManager = class BrowsersManager extends server_1.Service {
             browser.launch();
             this.unattachedBrowser = browser;
             try {
-                yield server_1.untilNotNull(() => browser.socket);
+                yield server_1.untilNotNull(() => browser.socket, 60000);
             }
             catch (error) {
                 this.unattachedBrowser = null;

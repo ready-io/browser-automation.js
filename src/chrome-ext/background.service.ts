@@ -61,10 +61,10 @@ export class BackgroundService
       sendResponse();
     });
 
-    //setInterval(() =>
-    //{
-      //this.log('browser.ping');
-    //}, 5000);
+    setInterval(() =>
+    {
+      this.log('browser.ping');
+    }, 5000);
   }
 
 
@@ -135,7 +135,7 @@ export class BackgroundService
           callback();
         }
       });
-    }, 2000);
+    }, 3000);
   }
 
 
