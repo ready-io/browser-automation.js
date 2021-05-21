@@ -23,7 +23,6 @@ class BrowserTab {
         this.browser = browser;
         this.socket = null;
         this.defaultTimeout = 35000;
-        this.url = "";
         this.socket = browser.socket;
     }
     timeout(timeout) {
@@ -74,18 +73,17 @@ class BrowserTab {
     }
     load(url) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.url = url;
             yield this.browser.request('load', {
                 tabId: this.id,
                 url: url,
             });
         });
     }
-    screenshot() {
+    screenshot(path = "logs/out.jpeg") {
         return __awaiter(this, void 0, void 0, function* () {
             const base64 = yield this.browser.request('screenshot');
             return new Promise((resolve, reject) => {
-                require("fs").writeFile("logs/out.jpeg", base64, 'base64', (err) => {
+                require("fs").writeFile(path, base64, 'base64', (err) => {
                     if (err) {
                         reject(err);
                         return;
@@ -153,7 +151,7 @@ class BrowserTab {
             const reCaptchaParams = yield this.getReCaptchaParameters();
             log.debug(`recaptcha params ${JSON.stringify(reCaptchaParams)}`);
             const urlSet = `https://2captcha.com/in.php?key=${captcha2ApiKey}&method=userrecaptcha` +
-                `&googlekey=${reCaptchaParams.sitekey}&json=1&pageurl=${this.url}`;
+                `&googlekey=${reCaptchaParams.sitekey}&json=1&pageurl=${reCaptchaParams.pageurl}`;
             const response = yield got_1.default(urlSet).json();
             log.debug(`2captcha sent ${urlSet} ${JSON.stringify(response)}`);
             const id = response.request;

@@ -5,6 +5,7 @@ export declare class ContentService {
     onWindowLoad(): void;
     onRequest(request: any): Promise<void>;
     sendMessage(message: any): void;
+    log(message: any): void;
     getElement(selector: string): HTMLElement;
     getElements(selector: string): NodeListOf<HTMLElement>;
     isVisible(selector: string): boolean;
@@ -18,6 +19,7 @@ export declare class ContentService {
     getReCaptchaParameters(_params: any): {
         callback: any;
         sitekey: any;
+        pageurl: any;
     };
     solveReCaptchaV2(params: any): void;
     eval(params: any): Promise<any>;

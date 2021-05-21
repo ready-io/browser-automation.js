@@ -10,7 +10,6 @@ export class BrowserTab
 {
   protected socket: Socket = null;
   protected defaultTimeout = 35000;
-  protected url: string = "";
 
 
   constructor(public logger: LoggerService, public id: string, public browser: Browser)
@@ -87,8 +86,6 @@ export class BrowserTab
 
   async load(url: string)
   {
-    this.url = url;
-
     await this.browser.request('load', {
       tabId: this.id,
       url: url,
@@ -96,13 +93,13 @@ export class BrowserTab
   }
 
 
-  async screenshot()
+  async screenshot(path: string = "logs/out.jpeg")
   {
     const base64 = await this.browser.request<string>('screenshot');
 
     return new Promise((resolve, reject) =>
     {
-      require("fs").writeFile("logs/out.jpeg", base64, 'base64', (err: any) =>
+      require("fs").writeFile(path, base64, 'base64', (err: any) =>
       {
         if (err)
         {
@@ -171,7 +168,7 @@ export class BrowserTab
   }
 
 
-  getReCaptchaParameters(): Promise<{callback: string, sitekey: string}>
+  getReCaptchaParameters(): Promise<{callback: string, sitekey: string, pageurl: string}>
   {
     return this.request('getReCaptchaParameters');
   }
@@ -187,7 +184,7 @@ export class BrowserTab
     log.debug(`recaptcha params ${JSON.stringify(reCaptchaParams)}`);
 
     const urlSet = `https://2captcha.com/in.php?key=${captcha2ApiKey}&method=userrecaptcha`+
-                     `&googlekey=${reCaptchaParams.sitekey}&json=1&pageurl=${this.url}`;
+                     `&googlekey=${reCaptchaParams.sitekey}&json=1&pageurl=${reCaptchaParams.pageurl}`;
 
     const response: any = await got(urlSet).json();
 

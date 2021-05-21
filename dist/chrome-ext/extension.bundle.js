@@ -95,6 +95,10 @@ class BackgroundService {
             this.log('tab.ping');
             return;
         }
+        if (message.type == 'tab.log') {
+            this.log(message.content);
+            return;
+        }
         if (message.type == 'response') {
             this.respond(message.content);
         }
@@ -152,11 +156,14 @@ function findReCaptchaParamateres() {
     if (typeof (___grecaptcha_cfg) === 'undefined') {
         return null;
     }
-    return Object.entries(___grecaptcha_cfg.clients).map(([cid, client]) => {
+    const allParams = Object.entries(___grecaptcha_cfg.clients).map(([cid, client]) => {
         const data = { id: cid, version: cid >= 10000 ? 'V3' : 'V2' };
         const objects = Object.entries(client).filter(([_, value]) => value && typeof value === 'object');
         objects.forEach(([toplevelKey, toplevel]) => {
             const found = Object.entries(toplevel).find(([_, value]) => (value && typeof value === 'object' && 'sitekey' in value && 'size' in value));
+            if (typeof toplevel === 'object' && toplevel instanceof HTMLElement && toplevel['tagName'] === 'DIV') {
+                data.pageurl = toplevel.baseURI;
+            }
             if (found) {
                 const [sublevelKey, sublevel] = found;
                 data.sitekey = sublevel.sitekey;
@@ -174,7 +181,28 @@ function findReCaptchaParamateres() {
             }
         });
         return data;
-    })[0];
+    });
+    if (!Array.isArray(allParams)) {
+        return null;
+    }
+    let selected = null;
+    let maxFunLen = 0;
+    for (let params of allParams) {
+        if (typeof (params) !== "object" || typeof (params.callback) !== "string" ||
+            typeof (params.callback) !== "string" || typeof (params.sitekey) !== "string" ||
+            typeof (params.pageurl) !== "string") {
+            continue;
+        }
+        try {
+            const funLen = eval(params.callback + ".toString().length");
+            if (funLen > maxFunLen) {
+                selected = params;
+                maxFunLen = funLen;
+            }
+        }
+        catch (error) { }
+    }
+    return selected;
 }
 exports.findReCaptchaParamateres = findReCaptchaParamateres;
 //# sourceMappingURL=captcha-util.js.map
@@ -241,6 +269,9 @@ class ContentService {
     }
     sendMessage(message) {
         document.dispatchEvent(new CustomEvent("baext.content.message", { 'detail': message }));
+    }
+    log(message) {
+        this.sendMessage({ type: 'tab.log', content: message });
     }
     getElement(selector) {
         return document.querySelector(selector);
@@ -316,14 +347,13 @@ class ContentService {
     }
     getReCaptchaParameters(_params) {
         const reCaptchaParams = captcha_util_1.findReCaptchaParamateres();
-        if (typeof (reCaptchaParams) !== "object" ||
-            typeof (reCaptchaParams.callback) !== "string" ||
-            typeof (reCaptchaParams.sitekey) !== "string") {
+        if (reCaptchaParams === null) {
             throw new Error("ReCaptcha parameters not found");
         }
         return {
             callback: reCaptchaParams.callback,
-            sitekey: reCaptchaParams.sitekey
+            sitekey: reCaptchaParams.sitekey,
+            pageurl: reCaptchaParams.pageurl,
         };
     }
     solveReCaptchaV2(params) {

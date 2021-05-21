@@ -11,12 +11,11 @@ export declare class BrowserTab {
     browser: Browser;
     protected socket: Socket;
     protected defaultTimeout: number;
-    protected url: string;
     constructor(logger: LoggerService, id: string, browser: Browser);
     timeout(timeout: number): void;
     protected request<T>(action: string, params?: any): Promise<T>;
     load(url: string): Promise<void>;
-    screenshot(): Promise<unknown>;
+    screenshot(path?: string): Promise<unknown>;
     waitForVisible(selector: string): Promise<void>;
     click(selector: string): Promise<void>;
     waitForHidden(selector: string): Promise<void>;
@@ -27,6 +26,7 @@ export declare class BrowserTab {
     getReCaptchaParameters(): Promise<{
         callback: string;
         sitekey: string;
+        pageurl: string;
     }>;
     solveReCaptchaV2(captcha2ApiKey: string): Promise<void>;
     eval(functionStr: string): Promise<any>;

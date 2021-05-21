@@ -52,6 +52,9 @@ class ContentService {
     sendMessage(message) {
         document.dispatchEvent(new CustomEvent("baext.content.message", { 'detail': message }));
     }
+    log(message) {
+        this.sendMessage({ type: 'tab.log', content: message });
+    }
     getElement(selector) {
         return document.querySelector(selector);
     }
@@ -126,14 +129,13 @@ class ContentService {
     }
     getReCaptchaParameters(_params) {
         const reCaptchaParams = captcha_util_1.findReCaptchaParamateres();
-        if (typeof (reCaptchaParams) !== "object" ||
-            typeof (reCaptchaParams.callback) !== "string" ||
-            typeof (reCaptchaParams.sitekey) !== "string") {
+        if (reCaptchaParams === null) {
             throw new Error("ReCaptcha parameters not found");
         }
         return {
             callback: reCaptchaParams.callback,
-            sitekey: reCaptchaParams.sitekey
+            sitekey: reCaptchaParams.sitekey,
+            pageurl: reCaptchaParams.pageurl,
         };
     }
     solveReCaptchaV2(params) {

@@ -85,6 +85,10 @@ class BackgroundService {
             this.log('tab.ping');
             return;
         }
+        if (message.type == 'tab.log') {
+            this.log(message.content);
+            return;
+        }
         if (message.type == 'response') {
             this.respond(message.content);
         }

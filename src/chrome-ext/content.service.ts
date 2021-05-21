@@ -64,6 +64,12 @@ export class ContentService
   }
 
 
+  log(message: any)
+  {
+    this.sendMessage({type: 'tab.log', content: message});
+  }
+
+
   getElement(selector: string): HTMLElement
   {
     return document.querySelector<HTMLElement>(selector);
@@ -193,16 +199,15 @@ export class ContentService
   {
     const reCaptchaParams = findReCaptchaParamateres();
 
-    if (typeof(reCaptchaParams) !== "object" ||
-        typeof(reCaptchaParams.callback) !== "string" ||
-        typeof(reCaptchaParams.sitekey) !== "string")
+    if (reCaptchaParams === null)
     {
       throw new Error("ReCaptcha parameters not found");
     }
 
     return {
       callback: reCaptchaParams.callback,
-      sitekey: reCaptchaParams.sitekey
+      sitekey: reCaptchaParams.sitekey,
+      pageurl: reCaptchaParams.pageurl,
     };
   }
 
@@ -210,6 +215,7 @@ export class ContentService
   solveReCaptchaV2(params: any)
   {
     const evalCode = `${params.callback}('${params.token}')`;
+
     eval(evalCode);
   }
 

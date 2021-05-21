@@ -82,6 +82,12 @@ export class BackgroundService
       return;
     }
 
+    if (message.type == 'tab.log')
+    {
+      this.log(message.content);
+      return;
+    }
+
     if (message.type == 'response')
     {
       this.respond(message.content);
