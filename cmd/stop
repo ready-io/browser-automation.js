@@ -1,0 +1,24 @@
+#!/bin/bash
+
+help()
+{
+  printf "\
+Usage: cmd/stop
+
+Options:
+  -h help
+"
+  exit 1;
+}
+
+OPTIND=1
+while getopts 'h' flag; do
+  case "${flag}" in
+    h) help ;;
+    *) help ;;
+  esac
+done
+
+. cmd/vars
+
+docker-compose down -v --remove-orphans

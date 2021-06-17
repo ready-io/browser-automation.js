@@ -1,0 +1,30 @@
+#!/bin/bash
+
+help()
+{
+  printf "\
+Usage: cmd/start
+
+Options:
+  -h help
+  -d debug mode
+"
+  exit 1;
+}
+
+flag_detach="-d"
+
+OPTIND=1
+while getopts 'dh' flag; do
+  case "${flag}" in
+    d) flag_detach="" ;;
+    h) help ;;
+    *) help ;;
+  esac
+done
+
+. cmd/vars
+cmd/stop
+
+docker-compose up $flag_detach
+

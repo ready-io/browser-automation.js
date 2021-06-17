@@ -93,8 +93,21 @@ export class BrowserTab
   }
 
 
-  async screenshot(path: string = "logs/out.jpeg")
+  /**
+   * @param string path - chrome "logs/out.jpeg", firefox "logs/out.png"
+   */
+  async screenshot(path: string = "")
   {
+    if (!path)
+    {
+      switch (this.browser.options.name)
+      {
+        case "chrome": path = "logs/out.jpeg"; break;
+        case "firefox": path = "logs/out.png"; break;
+        default: throw new Error("Unsupported browser");
+      }
+    }
+
     const base64 = await this.browser.request<string>('screenshot');
 
     return new Promise((resolve, reject) =>

@@ -1,24 +1,31 @@
 import childProcess from "child_process";
-import { promisify } from 'util';
-import * as os from 'os';
-import * as path from 'path';
-import * as fs from 'fs';
-import removeFolder from 'rimraf';
-const mkdtempAsync = promisify(fs.mkdtemp);
 import uniqid from "uniqid";
 import {Socket} from "socket.io";
 import {BrowserTab} from "./browser-tab";
 import {Inject, LoggerService, Service, sleep} from "@ready.io/server";
+import treeKill from 'tree-kill';
+import finder from 'find-package-json';
+import path from "path";
 
-const COOKIE_PATH = `${__dirname}/../dist/chrome-ext`;
+const PATH = path.dirname(finder(__dirname).next().filename);
+const EXTENSION_PATH = `${PATH}/dist/src/browser-ext`;
+
+
+export interface BrowserOptions
+{
+  name?: string;
+  args?: string[];
+  binary?: string;
+}
+
 
 @Inject()
 export class Browser extends Service
 {
   protected proc: any;
-  protected userDataDir: string;
   socket: Socket = null;
   defaultTimeout = 35000;
+  options: BrowserOptions = {};
 
 
   constructor(public logger: LoggerService)
@@ -27,22 +34,27 @@ export class Browser extends Service
   }
 
 
-  async launch()
+  launch(options: BrowserOptions = {})
   {
     const log = this.logger.action('Browser.launch');
 
-    this.userDataDir = await mkdtempAsync(path.join(os.tmpdir(), 'busca_multas_chrome_profile-'));
+    options =
+    {
+      name: options.name || 'chrome',
+      args: options.args || [],
+      binary: options.binary || '',
+    };
 
-    this.proc = childProcess.spawn('/usr/bin/google-chrome', [
-      //'--no-sandbox',
-      '--no-first-run', // avoid being asked to set the browser as the default
-      'about:blank',
-      //`--user-data-dir=${this.userDataDir}`,
-      //`--user-data-dir=/app/var/chrome_profile`,
-      `--user-data-dir=/tmp/chrome_profile`,
-      `--disable-extensions-except=${COOKIE_PATH}`,
-      `--load-extension=${COOKIE_PATH}`,
-    ]);
+    this.options = options;
+
+    if (options.name == 'firefox')
+    {
+      this.launchFirefox(options.args);
+    }
+    else
+    {
+      this.launchChrome(options.args);
+    }
 
     if (!this.proc || !this.proc.pid)
     {
@@ -54,21 +66,45 @@ export class Browser extends Service
   }
 
 
+  protected async launchFirefox(args: string[] = [])
+  {
+    if (this.options.binary)
+    {
+      args.push(`--firefox=${this.options.binary}`);
+    }
+
+    this.proc = childProcess.spawn('web-ext', [
+      `run`,
+      `--no-reload`,
+      ...
+      args
+    ]);
+  }
+
+
+  protected async launchChrome(args: string[] = [])
+  {
+    this.proc = childProcess.spawn('/usr/bin/google-chrome', [
+      '--no-first-run', // avoid being asked to set the browser as the default
+      'about:blank',
+      `--user-data-dir=/tmp/chrome_profile`,
+      `--disable-extensions-except=${EXTENSION_PATH}`,
+      `--load-extension=${EXTENSION_PATH}`,
+      ...
+      args
+    ]);
+  }
+
+
   close()
   {
     const log = this.logger.action('Browser.close');
-
-    try
-    {
-      removeFolder.sync(this.userDataDir);
-    }
-    catch (error) { }
 
     if (this.proc && this.proc.pid && !this.proc.killed)
     {
       try
       {
-        this.proc.kill('SIGKILL');
+        treeKill(this.proc.pid);
       }
       catch (error)
       {

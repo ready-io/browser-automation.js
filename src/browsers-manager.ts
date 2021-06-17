@@ -1,5 +1,5 @@
 import {Inject, LoggerService, Service, untilNotNull} from "@ready.io/server";
-import {Browser} from "./browser";
+import {Browser, BrowserOptions} from "./browser";
 
 
 @Inject()
@@ -17,7 +17,7 @@ export class BrowsersManager extends Service
   /**
    * @throws Error
    */
-  async launch(): Promise<Browser>
+  async launch(options: BrowserOptions = {}): Promise<Browser>
   {
     const log = this.logger.action('BrowsersManager.launch');
 
@@ -30,7 +30,7 @@ export class BrowsersManager extends Service
     log.debug('launching browser');
 
     const browser = new Browser(this.logger);
-    browser.launch();
+    browser.launch(options);
     this.unattachedBrowser = browser;
 
     try

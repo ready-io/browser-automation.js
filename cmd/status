@@ -1,0 +1,25 @@
+#!/bin/bash
+
+help()
+{
+  printf "\
+Usage: cmd/status
+
+Options:
+  -h help
+"
+  exit 1;
+}
+
+OPTIND=1
+while getopts 'h' flag; do
+  case "${flag}" in
+    h) help ;;
+    *) help ;;
+  esac
+done
+
+. cmd/vars
+
+docker-compose ps
+
