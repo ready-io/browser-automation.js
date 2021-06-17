@@ -23,9 +23,6 @@
     "url": "https://github.com/ready-io/browser-automation.js/issues"
   },
   "homepage": "https://github.com/ready-io/browser-automation.js#readme",
-  "webExt": {
-    "sourceDir": "dist/src/browser-ext/"
-  },
   "devDependencies": {
     "@ready.io/server": "^0.3.1",
     "@types/chrome": "0.0.129",

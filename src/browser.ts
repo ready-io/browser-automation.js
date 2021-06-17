@@ -75,6 +75,7 @@ export class Browser extends Service
 
     this.proc = childProcess.spawn('web-ext', [
       `run`,
+      `--source-dir=${EXTENSION_PATH}`,
       `--no-reload`,
       ...
       args
