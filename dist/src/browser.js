@@ -67,6 +67,7 @@ let Browser = class Browser extends server_1.Service {
             }
             this.proc = child_process_1.default.spawn('web-ext', [
                 `run`,
+                `--source-dir=${EXTENSION_PATH}`,
                 `--no-reload`,
                 ...args
             ]);

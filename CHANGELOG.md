@@ -1,3 +1,9 @@
+# V0.2.3
+
+### Fix:
+
+- Web-ext source dir
+
 # V0.2.2
 
 ### Fix:
