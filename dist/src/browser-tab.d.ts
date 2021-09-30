@@ -5,6 +5,22 @@ export interface Ajax {
     url: string;
     response: string;
 }
+export interface Rectangule {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+export interface ElementRect {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+}
 export declare class BrowserTab {
     logger: LoggerService;
     id: string;
@@ -33,4 +49,9 @@ export declare class BrowserTab {
     }>;
     solveReCaptchaV2(captcha2ApiKey: string): Promise<void>;
     eval(functionStr: string): Promise<any>;
+    getBoundingClientRect(selector: string): Promise<ElementRect>;
+    scroll(x: number, y: number): Promise<void>;
+    screenshotRect(rect: Rectangule): Promise<string>;
+    base64ToFile(path: string, base64: string): Promise<void>;
+    solveCaptcha(selector: string, captcha2ApiKey: string): Promise<string>;
 }

@@ -195,6 +195,73 @@ class BrowserTab {
             functionStr: functionStr
         });
     }
+    getBoundingClientRect(selector) {
+        return this.request('getBoundingClientRect', {
+            selector: selector,
+        });
+    }
+    scroll(x, y) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.request('scroll', {
+                x: x,
+                y: y,
+            });
+        });
+    }
+    screenshotRect(rect) {
+        return this.browser.request('screenshotRect', {
+            x: rect.x,
+            y: rect.y,
+            width: rect.width,
+            height: rect.height,
+        });
+    }
+    base64ToFile(path, base64) {
+        return new Promise((resolve, reject) => {
+            require("fs").writeFile(path, base64, 'base64', (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve();
+            });
+        });
+    }
+    solveCaptcha(selector, captcha2ApiKey) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const log = this.logger.action('BrowserTab.solveCaptcha');
+            const captchaRect = yield this.getBoundingClientRect(selector);
+            const captchaBase64 = yield this.screenshotRect(captchaRect);
+            const urlSet = `https://2captcha.com/in.php`;
+            yield this.base64ToFile("logs/out.png", captchaBase64);
+            const response = yield got_1.default.post(urlSet, {
+                form: {
+                    method: "base64",
+                    key: captcha2ApiKey,
+                    body: captchaBase64,
+                    json: 1
+                }
+            }).json();
+            log.debug(`2captcha sent ${urlSet} ${JSON.stringify(response)}`);
+            const id = response.request;
+            const urlGet = `https://2captcha.com/res.php?key=${captcha2ApiKey}&action=get&id=${id}&json=1`;
+            let text = "";
+            for (let attempt = 1; attempt <= 24; attempt++) {
+                yield server_1.sleep(5000);
+                let response = yield got_1.default(urlGet).json();
+                log.debug(`2captcha response ${JSON.stringify(response)}`);
+                if (response.status == 1) {
+                    text = response.request;
+                    break;
+                }
+            }
+            if (text === "") {
+                log.error("cannot get captcha text");
+                throw new Error("cannot get captcha text");
+            }
+            return text;
+        });
+    }
 }
 exports.BrowserTab = BrowserTab;
 //# sourceMappingURL=browser-tab.js.map

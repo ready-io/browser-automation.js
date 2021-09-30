@@ -130,7 +130,7 @@ test('getReCaptchaParameters', async () =>
   const reCaptchaParams = await tab.getReCaptchaParameters();
 
   expect(reCaptchaParams).toEqual({
-    callback: "___grecaptcha_cfg.clients['0']['G']['G']['callback']",
+    callback: "___grecaptcha_cfg.clients['0']['L']['L']['callback']",
     sitekey: '6Le-wvkSAAAAAPBMRTvw0Q4Muexq9bi0DJwx_mJ-',
     pageurl: 'https://www.google.com/recaptcha/api2/demo'
   });
@@ -150,4 +150,67 @@ test('eval', async () =>
   }`);
 
   expect(body).toBe('pong');
+});
+
+
+test('getBoundingClientRect', async () =>
+{
+  await tab.load("https://github.com/hrcarsan");
+  const clientRect = await tab.getBoundingClientRect("[itemprop='name']");
+
+  expect(clientRect).toEqual(
+  {
+    x: 32,
+    y: 345.75,
+    width: 216.75,
+    height: 32,
+    top: 345.75,
+    right: 248.75,
+    bottom: 377.75,
+    left: 32
+  });
+});
+
+
+test('scroll', async () =>
+{
+  await tab.load("https://github.com/hrcarsan");
+  let clientRect = await tab.getBoundingClientRect('[href="/hrcarsan?tab=repositories"]');
+
+  await tab.scroll(0, clientRect.y);
+
+  clientRect = await tab.getBoundingClientRect('[href="/hrcarsan?tab=repositories"]');
+
+  expect(clientRect.y).toBe(0);
+});
+
+
+test('screenshotRect', async () =>
+{
+  await tab.load("https://github.com/hrcarsan");
+
+  let clientRect = await tab.getBoundingClientRect('[href="/hrcarsan?tab=repositories"]');
+  const base64 = await tab.screenshotRect(clientRect);
+
+  expect(base64).toHaveLength(4428);
+});
+
+
+test('base64ToFile', async () =>
+{
+  await tab.load("https://github.com/hrcarsan");
+
+  let clientRect = await tab.getBoundingClientRect('[href="/hrcarsan?tab=repositories"]');
+  const base64 = await tab.screenshotRect(clientRect);
+
+  await tab.base64ToFile("logs/out.png", base64);
+});
+
+
+test('solveCaptcha', async () =>
+{
+  await tab.load("https://2captcha.com/demo/normal");
+  const text = await tab.solveCaptcha("#captcha", '2captchakey');
+
+  expect(text.toLowerCase()).toBe("w9h5k");
 });

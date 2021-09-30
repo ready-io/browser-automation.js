@@ -149,6 +149,17 @@ class ContentService {
             return yield eval(`(${params.functionStr})(util)`);
         });
     }
+    getBoundingClientRect(params) {
+        const selector = params.selector;
+        const element = this.getElement(selector);
+        if (element === null) {
+            throw new Error("Element not found");
+        }
+        return element.getBoundingClientRect();
+    }
+    scroll(params) {
+        window.scroll(params.x, params.y);
+    }
 }
 exports.ContentService = ContentService;
 //# sourceMappingURL=content.service.js.map

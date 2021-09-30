@@ -15,5 +15,6 @@ export declare class BackgroundService {
     createTab(_: any, callback: (data?: any) => void): void;
     load(params: any, callback: (data?: any) => void): void;
     screenshot(_: any, callback: (data?: any) => void): void;
+    screenshotRect(params: any, callback: (data?: any) => void): void;
 }
 export {};

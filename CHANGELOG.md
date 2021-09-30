@@ -1,3 +1,13 @@
+# V0.3.0
+
+### New:
+
+- tab.getBoundingClientRect()
+- tab.solveCaptcha()
+- tab.scroll()
+- tab.screenshotRect()
+- tab.base64ToFile()
+
 # V0.2.3
 
 ### Fix:

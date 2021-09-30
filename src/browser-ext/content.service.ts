@@ -228,4 +228,24 @@ export class ContentService
 
     return await eval(`(${params.functionStr})(util)`);
   }
+
+
+  getBoundingClientRect(params: any)
+  {
+    const selector = params.selector;
+    const element = this.getElement(selector);
+
+    if (element === null)
+    {
+      throw new Error("Element not found");
+    }
+
+    return element.getBoundingClientRect();
+  }
+
+
+  scroll(params: any)
+  {
+    window.scroll(params.x, params.y);
+  }
 }

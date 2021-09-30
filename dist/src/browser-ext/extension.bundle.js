@@ -139,6 +139,21 @@ class BackgroundService {
             callback(screenshotUrl);
         });
     }
+    screenshotRect(params, callback) {
+        Browser.tabs.captureVisibleTab({ format: "png" }, (screenshotUrl) => {
+            var canvas = document.createElement("canvas");
+            canvas.width = params.width;
+            canvas.height = params.height;
+            var context = canvas.getContext('2d');
+            var croppedImage = new Image();
+            croppedImage.onload = () => {
+                context.drawImage(croppedImage, params.x, params.y, params.width, params.height, 0, 0, params.width, params.height);
+                screenshotUrl = canvas.toDataURL().replace(/^data:image\/png;base64,/, '');
+                callback(screenshotUrl);
+            };
+            croppedImage.src = screenshotUrl;
+        });
+    }
 }
 exports.BackgroundService = BackgroundService;
 //# sourceMappingURL=background.service.js.map
@@ -369,6 +384,17 @@ class ContentService {
             util.untilTrue = util_1.untilTrue;
             return yield eval(`(${params.functionStr})(util)`);
         });
+    }
+    getBoundingClientRect(params) {
+        const selector = params.selector;
+        const element = this.getElement(selector);
+        if (element === null) {
+            throw new Error("Element not found");
+        }
+        return element.getBoundingClientRect();
+    }
+    scroll(params) {
+        window.scroll(params.x, params.y);
     }
 }
 exports.ContentService = ContentService;

@@ -23,4 +23,6 @@ export declare class ContentService {
     };
     solveReCaptchaV2(params: any): void;
     eval(params: any): Promise<any>;
+    getBoundingClientRect(params: any): DOMRect;
+    scroll(params: any): void;
 }

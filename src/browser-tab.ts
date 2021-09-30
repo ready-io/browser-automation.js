@@ -4,7 +4,33 @@ import {Socket} from "socket.io";
 import got from 'got';
 import {LoggerService, sleep} from "@ready.io/server";
 
-export interface Ajax {url: string, response: string}
+export interface Ajax
+{
+  url: string,
+  response: string
+}
+
+export interface Rectangule
+{
+  x: number,
+  y: number,
+  width: number,
+  height: number
+}
+
+
+export interface ElementRect
+{
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  top: number,
+  right: number,
+  bottom: number,
+  left: number,
+}
+
 
 export class BrowserTab
 {
@@ -239,5 +265,101 @@ export class BrowserTab
     return this.request('eval', {
       functionStr: functionStr
     });
+  }
+
+
+  getBoundingClientRect(selector: string)
+  {
+    return this.request<ElementRect>('getBoundingClientRect', {
+      selector: selector,
+    });
+  }
+
+
+  async scroll(x: number, y: number)
+  {
+    await this.request('scroll', {
+      x: x,
+      y: y,
+    });
+  }
+
+
+  screenshotRect(rect: Rectangule)
+  {
+    return this.browser.request<string>('screenshotRect', {
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+    });
+  }
+
+
+  base64ToFile(path: string, base64: string): Promise<void>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      require("fs").writeFile(path, base64, 'base64', (err: any) =>
+      {
+        if (err)
+        {
+          reject(err);
+          return;
+        }
+
+        resolve();
+      });
+    });
+  }
+
+
+  async solveCaptcha(selector: string, captcha2ApiKey: string)
+  {
+    const log = this.logger.action('BrowserTab.solveCaptcha');
+
+    const captchaRect = await this.getBoundingClientRect(selector);
+    const captchaBase64 = await this.screenshotRect(captchaRect);
+    const urlSet = `https://2captcha.com/in.php`;
+
+    await this.base64ToFile("logs/out.png", captchaBase64);
+
+    const response: any = await got.post(urlSet, {
+      form:
+      {
+        method: "base64",
+        key: captcha2ApiKey,
+        body: captchaBase64,
+        json: 1
+      }
+    }).json();
+
+    log.debug(`2captcha sent ${urlSet} ${JSON.stringify(response)}`);
+
+    const id = response.request;
+    const urlGet = `https://2captcha.com/res.php?key=${captcha2ApiKey}&action=get&id=${id}&json=1`;
+    let text = "";
+
+    for (let attempt = 1; attempt <= 24; attempt++)
+    {
+      await sleep(5000);
+
+      let response: any = await got(urlGet).json();
+      log.debug(`2captcha response ${JSON.stringify(response)}`);
+
+      if (response.status == 1)
+      {
+        text = response.request;
+        break;
+      }
+    }
+
+    if (text === "")
+    {
+      log.error("cannot get captcha text");
+      throw new Error("cannot get captcha text");
+    }
+
+    return text;
   }
 }
