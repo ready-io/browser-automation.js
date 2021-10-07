@@ -1,4 +1,5 @@
-import {Inject, LoggerService, Service, untilNotNull} from "@ready.io/server";
+import {HttpService, Inject, LoggerService, Service, untilNotNull} from "@ready.io/server";
+import {Socket} from "socket.io";
 import {Browser, BrowserOptions} from "./browser";
 
 
@@ -8,9 +9,16 @@ export class BrowsersManager extends Service
   protected unattachedBrowser: Browser = null;
 
 
-  constructor(public logger: LoggerService)
+  constructor(public logger: LoggerService,
+              public http: HttpService)
   {
     super();
+  }
+
+
+  onInit()
+  {
+    this.http.io.on('connection', socket => this.attach(socket));
   }
 
 
@@ -30,6 +38,7 @@ export class BrowsersManager extends Service
     log.debug('launching browser');
 
     const browser = new Browser(this.logger);
+    browser.id = this.http.io? this.http.io.of("/").sockets.size: 0;
     browser.launch(options);
     this.unattachedBrowser = browser;
 
@@ -40,7 +49,7 @@ export class BrowsersManager extends Service
     catch (error)
     {
       this.unattachedBrowser = null;
-      browser.close();
+      await browser.close();
       log.error('BrowsersManager.launch - the WebSocket cannot be attached');
       throw new Error('BrowsersManager.launch - the WebSocket cannot be attached');
     }
@@ -53,14 +62,25 @@ export class BrowsersManager extends Service
   }
 
 
-  attach(socket: any)
+  attach(socket: Socket)
   {
     if (this.unattachedBrowser === null)
     {
       return;
     }
 
-    this.unattachedBrowser.socket = socket;
+    const log = this.logger.action('BrowsersManager.attach');
+
+    log.debug('socket connected '+socket.id);
+
+    this.unattachedBrowser.setSocket(socket);
     this.unattachedBrowser = null;
+
+    socket.on('disconnect', (reason) =>
+    {
+      const log = this.logger.action('BrowsersManager.unattach');
+
+      log.debug('socket disconnected', socket.id, reason, socket.disconnected);
+    });
   }
 }

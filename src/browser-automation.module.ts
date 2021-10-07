@@ -1,10 +1,8 @@
 import {HttpService, Module, LoggerModule, Inject, ConfigHandler} from "@ready.io/server";
-import {BrowsersController} from './browsers.controller';
 import {BrowsersManager} from "./browsers-manager";
 
 export class Options
 {
-  port = 3001;
   logsDir: string = '';
   logsLevel: string = 'error';
 }
@@ -32,12 +30,11 @@ export class BrowserAutomationModule extends Module
       }),
       HttpService.config((options) =>
       {
-        options.port = this.options.port;
+        options.port = 3214;
         options.socketsServer.enabled = true;
         options.socketsServer.cors = {origin: '*'};
       }),
       BrowsersManager,
-      BrowsersController,
     ];
   }
 

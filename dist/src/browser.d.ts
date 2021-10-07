@@ -8,6 +8,7 @@ export interface BrowserOptions {
 }
 export declare class Browser extends Service {
     logger: LoggerService;
+    id: number;
     protected proc: any;
     socket: Socket;
     defaultTimeout: number;
@@ -16,7 +17,8 @@ export declare class Browser extends Service {
     launch(options?: BrowserOptions): void;
     protected launchFirefox(args?: string[]): Promise<void>;
     protected launchChrome(args?: string[]): Promise<void>;
-    close(): void;
+    setSocket(socket: Socket): void;
+    close(): Promise<void>;
     timeout(timeout: number): void;
     request<T>(action: string, params?: any): Promise<T>;
     createTab(): Promise<BrowserTab>;

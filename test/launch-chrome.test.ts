@@ -14,7 +14,7 @@ test('launch browser', async () =>
 
   await tab.load("https://github.com/hrcarsan");
   await sleep(3*SECONDS);
-  browser.close();
+  await browser.close();
 
   module.stop();
 });
@@ -34,7 +34,7 @@ test('launch chrome with dev tools', async () =>
 
   await tab.load("https://github.com/hrcarsan");
   await sleep(3*SECONDS);
-  browser.close();
+  await browser.close();
 
   module.stop();
 });

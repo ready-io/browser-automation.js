@@ -22,10 +22,14 @@ exports.BrowsersManager = void 0;
 const server_1 = require("@ready.io/server");
 const browser_1 = require("./browser");
 let BrowsersManager = class BrowsersManager extends server_1.Service {
-    constructor(logger) {
+    constructor(logger, http) {
         super();
         this.logger = logger;
+        this.http = http;
         this.unattachedBrowser = null;
+    }
+    onInit() {
+        this.http.io.on('connection', socket => this.attach(socket));
     }
     /**
      * @throws Error
@@ -39,6 +43,7 @@ let BrowsersManager = class BrowsersManager extends server_1.Service {
             }
             log.debug('launching browser');
             const browser = new browser_1.Browser(this.logger);
+            browser.id = this.http.io ? this.http.io.of("/").sockets.size : 0;
             browser.launch(options);
             this.unattachedBrowser = browser;
             try {
@@ -46,7 +51,7 @@ let BrowsersManager = class BrowsersManager extends server_1.Service {
             }
             catch (error) {
                 this.unattachedBrowser = null;
-                browser.close();
+                yield browser.close();
                 log.error('BrowsersManager.launch - the WebSocket cannot be attached');
                 throw new Error('BrowsersManager.launch - the WebSocket cannot be attached');
             }
@@ -59,13 +64,20 @@ let BrowsersManager = class BrowsersManager extends server_1.Service {
         if (this.unattachedBrowser === null) {
             return;
         }
-        this.unattachedBrowser.socket = socket;
+        const log = this.logger.action('BrowsersManager.attach');
+        log.debug('socket connected ' + socket.id);
+        this.unattachedBrowser.setSocket(socket);
         this.unattachedBrowser = null;
+        socket.on('disconnect', (reason) => {
+            const log = this.logger.action('BrowsersManager.unattach');
+            log.debug('socket disconnected', socket.id, reason, socket.disconnected);
+        });
     }
 };
 BrowsersManager = __decorate([
     server_1.Inject(),
-    __metadata("design:paramtypes", [server_1.LoggerService])
+    __metadata("design:paramtypes", [server_1.LoggerService,
+        server_1.HttpService])
 ], BrowsersManager);
 exports.BrowsersManager = BrowsersManager;
 //# sourceMappingURL=browsers-manager.js.map

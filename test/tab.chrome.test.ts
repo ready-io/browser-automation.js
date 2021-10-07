@@ -32,15 +32,15 @@ beforeEach(async () =>
 });
 
 
-afterEach(() =>
+afterEach(async () =>
 {
-  browser.close();
+  await browser.close();
 });
 
 
 test('screenshot', async () =>
 {
-  await tab.load("http://localhost:3001/ping");
+  await tab.load("http://localhost:3214/ping");
   await tab.screenshot();
 });
 
@@ -142,7 +142,7 @@ test.todo('solveReCaptchaV2');
 
 test('eval', async () =>
 {
-  await tab.load("http://localhost:3001/ping");
+  await tab.load("http://localhost:3214/ping");
 
   const body: string = await tab.eval(`() =>
   {
@@ -207,7 +207,7 @@ test('base64ToFile', async () =>
 });
 
 
-test('solveCaptcha', async () =>
+test.skip('solveCaptcha', async () =>
 {
   await tab.load("https://2captcha.com/demo/normal");
   const text = await tab.solveCaptcha("#captcha", '2captchakey');

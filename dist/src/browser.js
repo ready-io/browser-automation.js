@@ -58,7 +58,7 @@ let Browser = class Browser extends server_1.Service {
             log.error('Browser - The browser cannont be launched');
             throw new Error('Browser - The browser cannont be launched');
         }
-        log.debug('browser launched');
+        log.debug(`browser launched id ${this.id}`);
     }
     launchFirefox(args = []) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -78,25 +78,37 @@ let Browser = class Browser extends server_1.Service {
             this.proc = child_process_1.default.spawn('/usr/bin/google-chrome', [
                 '--no-first-run',
                 'about:blank',
-                `--user-data-dir=/tmp/chrome_profile`,
+                `--user-data-dir=/tmp/chrome_profile${this.id}`,
                 `--disable-extensions-except=${EXTENSION_PATH}`,
                 `--load-extension=${EXTENSION_PATH}`,
                 ...args
             ]);
         });
     }
+    setSocket(socket) {
+        this.socket = socket;
+    }
     close() {
-        const log = this.logger.action('Browser.close');
-        if (this.proc && this.proc.pid && !this.proc.killed) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const log = this.logger.action('Browser.close');
+            if (this.proc && this.proc.pid && !this.proc.killed) {
+                try {
+                    tree_kill_1.default(this.proc.pid);
+                }
+                catch (error) {
+                    log.error('Browser - the browser cannot be closed');
+                    throw new Error('Browser - the browser cannot be closed');
+                }
+            }
             try {
-                tree_kill_1.default(this.proc.pid);
+                yield server_1.untilTrue(() => this.socket.disconnected, 60000);
             }
             catch (error) {
-                log.error('Browser - the browser cannot be closed');
-                throw new Error('Browser - the browser cannot be closed');
+                log.error('Browser - the browser cannot be unattached');
+                throw new Error('Browser - the browser cannot be unattached');
             }
             log.debug('browser closed');
-        }
+        });
     }
     timeout(timeout) {
         this.defaultTimeout = timeout;

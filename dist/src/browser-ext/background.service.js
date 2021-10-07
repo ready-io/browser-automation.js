@@ -38,7 +38,7 @@ class BackgroundService {
     }
     init() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.socket = io.connect("http://localhost:3001", {
+            this.socket = io.connect("http://localhost:3214", {
                 'reconnection': true,
                 'reconnectionDelay': 1000,
                 'reconnectionDelayMax': 5000,

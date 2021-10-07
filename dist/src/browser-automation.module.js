@@ -8,11 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BrowserAutomationModule = exports.Options = void 0;
 const server_1 = require("@ready.io/server");
-const browsers_controller_1 = require("./browsers.controller");
 const browsers_manager_1 = require("./browsers-manager");
 class Options {
     constructor() {
-        this.port = 3001;
         this.logsDir = '';
         this.logsLevel = 'error';
     }
@@ -33,12 +31,11 @@ let BrowserAutomationModule = class BrowserAutomationModule extends server_1.Mod
                 options.level = this.options.logsLevel;
             }),
             server_1.HttpService.config((options) => {
-                options.port = this.options.port;
+                options.port = 3214;
                 options.socketsServer.enabled = true;
                 options.socketsServer.cors = { origin: '*' };
             }),
             browsers_manager_1.BrowsersManager,
-            browsers_controller_1.BrowsersController,
         ];
     }
     onInit() {

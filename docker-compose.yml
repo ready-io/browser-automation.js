@@ -10,4 +10,4 @@ services:
     command: bash -c "Xvfb :99 -screen 0 1024x768x16 -ac -nolisten tcp -nolisten unix & node ./dist/examples/app/app.js"
     privileged: true
     ports:
-      - 3001:3001
+      - 3214:3214

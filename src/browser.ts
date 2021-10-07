@@ -2,7 +2,7 @@ import childProcess from "child_process";
 import uniqid from "uniqid";
 import {Socket} from "socket.io";
 import {BrowserTab} from "./browser-tab";
-import {Inject, LoggerService, Service, sleep} from "@ready.io/server";
+import {Inject, LoggerService, Service, sleep, untilTrue} from "@ready.io/server";
 import treeKill from 'tree-kill';
 import finder from 'find-package-json';
 import path from "path";
@@ -22,6 +22,7 @@ export interface BrowserOptions
 @Inject()
 export class Browser extends Service
 {
+  id: number;
   protected proc: any;
   socket: Socket = null;
   defaultTimeout = 35000;
@@ -62,7 +63,7 @@ export class Browser extends Service
       throw new Error('Browser - The browser cannont be launched');
     }
 
-    log.debug('browser launched');
+    log.debug(`browser launched id ${this.id}`);
   }
 
 
@@ -88,7 +89,7 @@ export class Browser extends Service
     this.proc = childProcess.spawn('/usr/bin/google-chrome', [
       '--no-first-run', // avoid being asked to set the browser as the default
       'about:blank',
-      `--user-data-dir=/tmp/chrome_profile`,
+      `--user-data-dir=/tmp/chrome_profile${this.id}`,
       `--disable-extensions-except=${EXTENSION_PATH}`,
       `--load-extension=${EXTENSION_PATH}`,
       ...
@@ -97,7 +98,13 @@ export class Browser extends Service
   }
 
 
-  close()
+  setSocket(socket: Socket)
+  {
+    this.socket = socket;
+  }
+
+
+  async close()
   {
     const log = this.logger.action('Browser.close');
 
@@ -112,9 +119,19 @@ export class Browser extends Service
         log.error('Browser - the browser cannot be closed');
         throw new Error('Browser - the browser cannot be closed');
       }
-
-      log.debug('browser closed');
     }
+
+    try
+    {
+      await untilTrue(() => this.socket.disconnected, 60000);
+    }
+    catch (error)
+    {
+      log.error('Browser - the browser cannot be unattached');
+      throw new Error('Browser - the browser cannot be unattached');
+    }
+
+    log.debug('browser closed');
   }
 
 

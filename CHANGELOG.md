@@ -1,3 +1,14 @@
+# V0.4.0
+
+### Remove:
+
+- BrowserModule.options.port
+
+### New:
+
+- The BrowserModule will use the port 3214, cannot be changed
+- Multiple browsers can run in parallel
+
 # V0.3.0
 
 ### New:

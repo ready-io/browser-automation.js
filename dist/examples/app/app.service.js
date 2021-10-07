@@ -54,7 +54,7 @@ let AppService = class AppService extends server_1.Service {
             tab.waitForAjax('q=easy').then(a => ajax = a);
             yield tab.click('#type_source');
             yield server_1.untilNotNull(() => ajax, 35 * server_1.SECONDS);
-            browser.close();
+            yield browser.close();
             console.log(ajax.url);
         });
     }
@@ -76,7 +76,7 @@ let AppService = class AppService extends server_1.Service {
             tab.waitForAjax('q=easy').then(a => ajax = a);
             yield tab.click('#type_source');
             yield server_1.untilNotNull(() => ajax, 35 * server_1.SECONDS);
-            browser.close();
+            yield browser.close();
             console.log(ajax.url);
         });
     }

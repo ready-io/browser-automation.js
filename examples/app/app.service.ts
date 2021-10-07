@@ -43,7 +43,7 @@ export class AppService extends Service
     await tab.click('#type_source');
     await untilNotNull(() => ajax, 35*SECONDS);
 
-    browser.close();
+    await browser.close();
     console.log(ajax.url);
   }
 
@@ -71,7 +71,7 @@ export class AppService extends Service
     await tab.click('#type_source');
     await untilNotNull(() => ajax, 35*SECONDS);
 
-    browser.close();
+    await browser.close();
     console.log(ajax.url);
   }
 }

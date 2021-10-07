@@ -18,7 +18,7 @@ export class BackgroundService
 
   async init()
   {
-    this.socket = io.connect("http://localhost:3001",
+    this.socket = io.connect("http://localhost:3214",
     {
       'reconnection': true,
       'reconnectionDelay': 1000,

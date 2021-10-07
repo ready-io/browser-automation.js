@@ -16,7 +16,7 @@ test('launch firefox', async () =>
 
   await tab.load("https://github.com/hrcarsan");
   await sleep(3*SECONDS);
-  browser.close();
+  await browser.close();
 
   module.stop();
 });
@@ -36,7 +36,7 @@ test('launch firefox from dir', async () =>
 
   await tab.load("https://github.com/hrcarsan");
   await sleep(3*SECONDS);
-  browser.close();
+  await browser.close();
 
   module.stop();
 });
