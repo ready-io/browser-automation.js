@@ -21,8 +21,6 @@ test('launch browser', async () =>
     resolve(true);
   });
 
-  await sleep(1*SECONDS);
-
   const p2 = new Promise(async (resolve) =>
   {
     const browser = await browserManager.launch();

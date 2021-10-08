@@ -1,3 +1,9 @@
+# V0.4.1
+
+### Fix:
+
+- Error calling multiple BrowsersManager.launch simultaneous
+
 # V0.4.0
 
 ### Remove:

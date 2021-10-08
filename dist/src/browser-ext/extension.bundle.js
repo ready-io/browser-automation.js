@@ -441,7 +441,7 @@ exports.ExtensionModule = ExtensionModule;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.untilNotNull = exports.untilTrue = exports.untilNotEquals = exports.untilEquals = exports.untilCondition = exports.sleep = exports.HOURS = exports.HOUR = exports.MINUTES = exports.MINUTE = exports.SECONDS = exports.SECOND = void 0;
+exports.untilNull = exports.untilNotNull = exports.untilTrue = exports.untilNotEquals = exports.untilEquals = exports.untilCondition = exports.sleep = exports.HOURS = exports.HOUR = exports.MINUTES = exports.MINUTE = exports.SECONDS = exports.SECOND = void 0;
 exports.SECOND = 1000;
 exports.SECONDS = exports.SECOND;
 exports.MINUTE = 60 * exports.SECOND;
@@ -492,6 +492,10 @@ function untilNotNull(fun, timeout = 5000) {
     return untilNotEquals(null, fun, timeout);
 }
 exports.untilNotNull = untilNotNull;
+function untilNull(fun, timeout = 5000) {
+    return untilEquals(null, fun, timeout);
+}
+exports.untilNull = untilNull;
 //# sourceMappingURL=util.js.map
 
 /***/ }),

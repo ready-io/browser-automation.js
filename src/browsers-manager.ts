@@ -1,6 +1,7 @@
 import {HttpService, Inject, LoggerService, Service, untilNotNull} from "@ready.io/server";
 import {Socket} from "socket.io";
 import {Browser, BrowserOptions} from "./browser";
+import {untilNull} from "./util";
 
 
 @Inject()
@@ -29,18 +30,25 @@ export class BrowsersManager extends Service
   {
     const log = this.logger.action('BrowsersManager.launch');
 
-    if (this.unattachedBrowser !== null)
+    try
+    {
+      if (this.unattachedBrowser !== null)
+      {
+        await untilNull(() => this.unattachedBrowser, 60000);
+      }
+    }
+    catch (error)
     {
       log.error("there is another browser launching");
       throw new Error("there is another browser launching");
     }
 
+    this.unattachedBrowser = new Browser(this.logger);
     log.debug('launching browser');
 
-    const browser = new Browser(this.logger);
+    const browser = this.unattachedBrowser;
     browser.id = this.http.io? this.http.io.of("/").sockets.size: 0;
     browser.launch(options);
-    this.unattachedBrowser = browser;
 
     try
     {

@@ -69,3 +69,9 @@ export function untilNotNull(fun: () => any, timeout: number = 5000)
 {
   return untilNotEquals(null, fun, timeout);
 }
+
+
+export function untilNull(fun: () => any, timeout: number = 5000)
+{
+  return untilEquals(null, fun, timeout);
+}

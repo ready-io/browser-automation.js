@@ -10,3 +10,4 @@ export declare function untilEquals(value: any, fun: () => boolean, timeout?: nu
 export declare function untilNotEquals(value: any, fun: () => boolean, timeout?: number): Promise<boolean>;
 export declare function untilTrue(fun: () => boolean, timeout?: number): Promise<boolean>;
 export declare function untilNotNull(fun: () => any, timeout?: number): Promise<boolean>;
+export declare function untilNull(fun: () => any, timeout?: number): Promise<boolean>;

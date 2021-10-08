@@ -21,6 +21,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BrowsersManager = void 0;
 const server_1 = require("@ready.io/server");
 const browser_1 = require("./browser");
+const util_1 = require("./util");
 let BrowsersManager = class BrowsersManager extends server_1.Service {
     constructor(logger, http) {
         super();
@@ -37,15 +38,20 @@ let BrowsersManager = class BrowsersManager extends server_1.Service {
     launch(options = {}) {
         return __awaiter(this, void 0, void 0, function* () {
             const log = this.logger.action('BrowsersManager.launch');
-            if (this.unattachedBrowser !== null) {
+            try {
+                if (this.unattachedBrowser !== null) {
+                    yield util_1.untilNull(() => this.unattachedBrowser, 60000);
+                }
+            }
+            catch (error) {
                 log.error("there is another browser launching");
                 throw new Error("there is another browser launching");
             }
+            this.unattachedBrowser = new browser_1.Browser(this.logger);
             log.debug('launching browser');
-            const browser = new browser_1.Browser(this.logger);
+            const browser = this.unattachedBrowser;
             browser.id = this.http.io ? this.http.io.of("/").sockets.size : 0;
             browser.launch(options);
-            this.unattachedBrowser = browser;
             try {
                 yield server_1.untilNotNull(() => browser.socket, 60000);
             }
