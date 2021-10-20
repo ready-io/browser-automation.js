@@ -29,6 +29,7 @@ const server_1 = require("@ready.io/server");
 const tree_kill_1 = __importDefault(require("tree-kill"));
 const find_package_json_1 = __importDefault(require("find-package-json"));
 const path_1 = __importDefault(require("path"));
+const rimraf_1 = __importDefault(require("rimraf"));
 const PATH = path_1.default.dirname(find_package_json_1.default(__dirname).next().filename);
 const EXTENSION_PATH = `${PATH}/dist/src/browser-ext`;
 let Browser = class Browser extends server_1.Service {
@@ -38,6 +39,7 @@ let Browser = class Browser extends server_1.Service {
         this.socket = null;
         this.defaultTimeout = 35000;
         this.options = {};
+        this.id = uniqid_1.default();
     }
     launch(options = {}) {
         const log = this.logger.action('Browser.launch');
@@ -81,6 +83,7 @@ let Browser = class Browser extends server_1.Service {
                 `--user-data-dir=/tmp/chrome_profile${this.id}`,
                 `--disable-extensions-except=${EXTENSION_PATH}`,
                 `--load-extension=${EXTENSION_PATH}`,
+                `--disable-dev-shm-usage`,
                 ...args
             ]);
         });
@@ -106,6 +109,14 @@ let Browser = class Browser extends server_1.Service {
             catch (error) {
                 log.error('Browser - the browser cannot be unattached');
                 throw new Error('Browser - the browser cannot be unattached');
+            }
+            if (this.options.name == 'chrome') {
+                log.info('rimraf chrome_profile');
+                rimraf_1.default(`/tmp/chrome_profile${this.id}`, (error) => {
+                    if (error) {
+                        log.error(error.stack);
+                    }
+                });
             }
             log.debug('browser closed');
         });

@@ -1,3 +1,9 @@
+# V0.4.2
+
+### Fix:
+
+- Browsers ids conflicts
+
 # V0.4.1
 
 ### Fix:

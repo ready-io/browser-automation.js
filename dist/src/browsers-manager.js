@@ -50,7 +50,6 @@ let BrowsersManager = class BrowsersManager extends server_1.Service {
             this.unattachedBrowser = new browser_1.Browser(this.logger);
             log.debug('launching browser');
             const browser = this.unattachedBrowser;
-            browser.id = this.http.io ? this.http.io.of("/").sockets.size : 0;
             browser.launch(options);
             try {
                 yield server_1.untilNotNull(() => browser.socket, 60000);

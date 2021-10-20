@@ -6,6 +6,7 @@ import {Inject, LoggerService, Service, sleep, untilTrue} from "@ready.io/server
 import treeKill from 'tree-kill';
 import finder from 'find-package-json';
 import path from "path";
+import rimraf from "rimraf";
 
 const PATH = path.dirname(finder(__dirname).next().filename);
 const EXTENSION_PATH = `${PATH}/dist/src/browser-ext`;
@@ -22,7 +23,7 @@ export interface BrowserOptions
 @Inject()
 export class Browser extends Service
 {
-  id: number;
+  id: string;
   protected proc: any;
   socket: Socket = null;
   defaultTimeout = 35000;
@@ -32,6 +33,8 @@ export class Browser extends Service
   constructor(public logger: LoggerService)
   {
     super();
+
+    this.id = uniqid();
   }
 
 
@@ -92,6 +95,7 @@ export class Browser extends Service
       `--user-data-dir=/tmp/chrome_profile${this.id}`,
       `--disable-extensions-except=${EXTENSION_PATH}`,
       `--load-extension=${EXTENSION_PATH}`,
+      `--disable-dev-shm-usage`,
       ...
       args
     ]);
@@ -129,6 +133,19 @@ export class Browser extends Service
     {
       log.error('Browser - the browser cannot be unattached');
       throw new Error('Browser - the browser cannot be unattached');
+    }
+
+    if (this.options.name == 'chrome')
+    {
+      log.info('rimraf chrome_profile');
+
+      rimraf(`/tmp/chrome_profile${this.id}`, (error) =>
+      {
+        if (error)
+        {
+          log.error(error.stack);
+        }
+      });
     }
 
     log.debug('browser closed');

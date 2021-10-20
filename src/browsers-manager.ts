@@ -47,7 +47,6 @@ export class BrowsersManager extends Service
     log.debug('launching browser');
 
     const browser = this.unattachedBrowser;
-    browser.id = this.http.io? this.http.io.of("/").sockets.size: 0;
     browser.launch(options);
 
     try

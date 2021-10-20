@@ -8,7 +8,7 @@ export interface BrowserOptions {
 }
 export declare class Browser extends Service {
     logger: LoggerService;
-    id: number;
+    id: string;
     protected proc: any;
     socket: Socket;
     defaultTimeout: number;
