@@ -1,3 +1,9 @@
+# V0.4.3
+
+### Fix:
+
+- Lot of temp files .com.google.Chrome.
+
 # V0.4.2
 
 ### Fix:

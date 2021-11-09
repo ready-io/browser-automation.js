@@ -322,7 +322,7 @@ export class BrowserTab
     const captchaBase64 = await this.screenshotRect(captchaRect);
     const urlSet = `https://2captcha.com/in.php`;
 
-    await this.base64ToFile("logs/out.png", captchaBase64);
+    //await this.base64ToFile("logs/out.png", captchaBase64);
 
     const response: any = await got.post(urlSet, {
       form:

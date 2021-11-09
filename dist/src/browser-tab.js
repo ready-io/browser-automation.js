@@ -233,7 +233,7 @@ class BrowserTab {
             const captchaRect = yield this.getBoundingClientRect(selector);
             const captchaBase64 = yield this.screenshotRect(captchaRect);
             const urlSet = `https://2captcha.com/in.php`;
-            yield this.base64ToFile("logs/out.png", captchaBase64);
+            //await this.base64ToFile("logs/out.png", captchaBase64);
             const response = yield got_1.default.post(urlSet, {
                 form: {
                     method: "base64",

@@ -2,11 +2,13 @@ import childProcess from "child_process";
 import uniqid from "uniqid";
 import {Socket} from "socket.io";
 import {BrowserTab} from "./browser-tab";
-import {Inject, LoggerService, Service, sleep, untilTrue} from "@ready.io/server";
+import {HOUR, Inject, LoggerService, Service, sleep, untilTrue} from "@ready.io/server";
 import treeKill from 'tree-kill';
 import finder from 'find-package-json';
 import path from "path";
 import rimraf from "rimraf";
+import fs from 'fs';
+
 
 const PATH = path.dirname(finder(__dirname).next().filename);
 const EXTENSION_PATH = `${PATH}/dist/src/browser-ext`;
@@ -137,7 +139,7 @@ export class Browser extends Service
 
     if (this.options.name == 'chrome')
     {
-      log.info('rimraf chrome_profile');
+      log.debug('rimraf chrome_profile');
 
       rimraf(`/tmp/chrome_profile${this.id}`, (error) =>
       {
@@ -146,6 +148,8 @@ export class Browser extends Service
           log.error(error.stack);
         }
       });
+
+      this.removeChromeTmpFiles();
     }
 
     log.debug('browser closed');
@@ -223,5 +227,41 @@ export class Browser extends Service
     const tab   = new BrowserTab(this.logger, tabId, this);
 
     return tab;
+  }
+
+
+  removeChromeTmpFiles()
+  {
+    const log = this.logger.action('Browser.removeChromeTmpFiles');
+    const dir = '/tmp';
+
+    fs.readdir(dir, (_err, files) =>
+    {
+      files.filter(f => (/^\.com\.google\.Chrome\./).test(f)).forEach(file =>
+      {
+        fs.stat(path.join(dir, file), (err, stat) =>
+        {
+          if (err)
+          {
+            log.error(err.stack);
+            return;
+          }
+
+          const now = new Date().getTime();
+          const endTime = new Date(stat.ctime).getTime() + 1*HOUR;
+
+          if (now > endTime)
+          {
+            rimraf(path.join(dir, file), (err) =>
+            {
+              if (err)
+              {
+                log.error(err.stack);
+              }
+            });
+          }
+        });
+      });
+    });
   }
 }

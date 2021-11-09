@@ -30,6 +30,7 @@ const tree_kill_1 = __importDefault(require("tree-kill"));
 const find_package_json_1 = __importDefault(require("find-package-json"));
 const path_1 = __importDefault(require("path"));
 const rimraf_1 = __importDefault(require("rimraf"));
+const fs_1 = __importDefault(require("fs"));
 const PATH = path_1.default.dirname(find_package_json_1.default(__dirname).next().filename);
 const EXTENSION_PATH = `${PATH}/dist/src/browser-ext`;
 let Browser = class Browser extends server_1.Service {
@@ -111,12 +112,13 @@ let Browser = class Browser extends server_1.Service {
                 throw new Error('Browser - the browser cannot be unattached');
             }
             if (this.options.name == 'chrome') {
-                log.info('rimraf chrome_profile');
+                log.debug('rimraf chrome_profile');
                 rimraf_1.default(`/tmp/chrome_profile${this.id}`, (error) => {
                     if (error) {
                         log.error(error.stack);
                     }
                 });
+                this.removeChromeTmpFiles();
             }
             log.debug('browser closed');
         });
@@ -171,6 +173,29 @@ let Browser = class Browser extends server_1.Service {
             const tabId = yield this.request('createTab');
             const tab = new browser_tab_1.BrowserTab(this.logger, tabId, this);
             return tab;
+        });
+    }
+    removeChromeTmpFiles() {
+        const log = this.logger.action('Browser.removeChromeTmpFiles');
+        const dir = '/tmp';
+        fs_1.default.readdir(dir, (_err, files) => {
+            files.filter(f => (/^\.com\.google\.Chrome\./).test(f)).forEach(file => {
+                fs_1.default.stat(path_1.default.join(dir, file), (err, stat) => {
+                    if (err) {
+                        log.error(err.stack);
+                        return;
+                    }
+                    const now = new Date().getTime();
+                    const endTime = new Date(stat.ctime).getTime() + 1 * server_1.HOUR;
+                    if (now > endTime) {
+                        rimraf_1.default(path_1.default.join(dir, file), (err) => {
+                            if (err) {
+                                log.error(err.stack);
+                            }
+                        });
+                    }
+                });
+            });
         });
     }
 };

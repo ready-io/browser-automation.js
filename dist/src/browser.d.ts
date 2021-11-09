@@ -22,4 +22,5 @@ export declare class Browser extends Service {
     timeout(timeout: number): void;
     request<T>(action: string, params?: any): Promise<T>;
     createTab(): Promise<BrowserTab>;
+    removeChromeTmpFiles(): void;
 }
