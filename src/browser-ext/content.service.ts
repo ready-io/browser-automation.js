@@ -163,7 +163,7 @@ export class ContentService
       timeoutId = setTimeout(() =>
       {
         clear();
-        reject('timeout reached waiting for ajax');
+        reject(new Error('timeout reached waiting for ajax'));
       }, timeout);
 
       eventListener = (event: CustomEvent) =>

@@ -193,7 +193,7 @@ export class BrowserTab
   }
 
 
-  async waitForAjax(url: string): Promise<Ajax>
+  waitForAjax(url: string): Promise<Ajax>
   {
     return this.request('waitForAjax', {
       url: url,

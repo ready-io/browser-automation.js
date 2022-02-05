@@ -144,10 +144,8 @@ class BrowserTab {
         });
     }
     waitForAjax(url) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.request('waitForAjax', {
-                url: url,
-            });
+        return this.request('waitForAjax', {
+            url: url,
         });
     }
     waitForReCaptcha() {

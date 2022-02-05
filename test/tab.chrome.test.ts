@@ -13,6 +13,7 @@ let tab: BrowserTab = null;
 beforeAll(() =>
 {
   browserModule = new BrowserAutomationModule();
+  browserModule.options.logsLevel = 'debug';
   browserModule.init();
 
   browserManager = browserModule.provider.get(BrowsersManager);
@@ -110,6 +111,26 @@ test('waitForAjax', async () =>
 });
 
 
+test('waitForAjax timeout error', async () =>
+{
+  await tab.load("http://localhost:3214/ping");
+  tab.timeout(5*SECONDS);
+  let error = null;
+
+  try
+  {
+    await tab.waitForAjax('unexistingAjax');
+  }
+  catch (e)
+  {
+    error = e;
+  }
+
+  expect(error).toBeInstanceOf(Error);
+  expect(error.message).toMatch('timeout reached waiting for ajax');
+});
+
+
 test('waitForReCaptcha', async () =>
 {
   await tab.load("https://www.google.com/recaptcha/api2/demo");
@@ -130,7 +151,7 @@ test('getReCaptchaParameters', async () =>
   const reCaptchaParams = await tab.getReCaptchaParameters();
 
   expect(reCaptchaParams).toEqual({
-    callback: "___grecaptcha_cfg.clients['0']['L']['L']['callback']",
+    callback: "___grecaptcha_cfg.clients['0']['o']['o']['callback']",
     sitekey: '6Le-wvkSAAAAAPBMRTvw0Q4Muexq9bi0DJwx_mJ-',
     pageurl: 'https://www.google.com/recaptcha/api2/demo'
   });
@@ -161,12 +182,12 @@ test('getBoundingClientRect', async () =>
   expect(clientRect).toEqual(
   {
     x: 32,
-    y: 345.75,
-    width: 216.75,
-    height: 32,
-    top: 345.75,
-    right: 248.75,
-    bottom: 377.75,
+    y: 425,
+    width: 296,
+    height: 32.5,
+    top: 425,
+    right: 328,
+    bottom: 457.5,
     left: 32
   });
 });
@@ -192,7 +213,7 @@ test('screenshotRect', async () =>
   let clientRect = await tab.getBoundingClientRect('[href="/hrcarsan?tab=repositories"]');
   const base64 = await tab.screenshotRect(clientRect);
 
-  expect(base64).toHaveLength(4428);
+  expect(base64).toHaveLength(440);
 });
 
 

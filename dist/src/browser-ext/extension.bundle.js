@@ -343,7 +343,7 @@ class ContentService {
             const clear = () => { clearTimeout(timeoutId); };
             timeoutId = setTimeout(() => {
                 clear();
-                reject('timeout reached waiting for ajax');
+                reject(new Error('timeout reached waiting for ajax'));
             }, timeout);
             eventListener = (event) => {
                 const ajax = event.detail;
